@@ -1,0 +1,7 @@
+interface:
+  display_name: "Requirements Alignment (Auto)"
+  short_description: "Align unclear product direction before implementation"
+  default_prompt: "Use $requirements-alignment to align unclear greenfield product direction before implementation without asking about ordinary engineering details."
+
+policy:
+  allow_implicit_invocation: true

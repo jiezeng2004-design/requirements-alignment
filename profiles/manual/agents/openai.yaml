@@ -1,0 +1,7 @@
+interface:
+  display_name: "Requirements Alignment (Manual)"
+  short_description: "Explicitly align product direction before implementation"
+  default_prompt: "Use $requirements-alignment to clarify product direction and key boundaries before implementation while leaving engineering details to Codex."
+
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,11 @@
+# Release artifacts
+*.zip
+
+# Installer and test scratch data
+.requirements-alignment-*.tmp
+requirements-alignment-tests-*/
+requirements-alignment-backups/
+
+# OS-generated files
+Thumbs.db
+.DS_Store
