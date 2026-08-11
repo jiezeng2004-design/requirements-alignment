@@ -1,258 +1,312 @@
+**English** | [简体中文](README.zh-CN.md)
+
 # Requirements Alignment for Codex
 
-> 先对齐方向，再开始开发。
+> Align before coding. Re-align when direction changes. Then get out of the way.
 
-让 Codex 在真正动手之前，先和你确认产品方向、需求边界和关键决策。
+Stop Codex from silently deciding what your product should be.
 
-**关键方向你决定，工程细节交给 Codex。**
+Requirements Alignment is a lightweight direction-alignment guardrail for Codex Desktop. It asks about the decisions that define what you are building, then steps aside and lets Codex code.
 
-Requirements Alignment 给 AI Coding 加一道“方向护栏”，减少 Codex 默默补全产品方向后一路开发、做到一半才发现方向错了的情况。它不是让 Codex 多问问题，也不会把 Coding Agent 变成问卷机器人。
+**You decide the direction. Codex decides the engineering details.**
 
-- **Auto Mode（推荐）**：遇到新项目、模糊想法或未确定的关键方向时自动介入。
-- **Manual Mode**：关闭自动介入，只在你显式调用 `$requirements-alignment` 时运行。
-- **Native structured questions**：可用时优先使用 Codex 原生 `request_user_input`。
-- **Safe install / uninstall / restore**：支持模式切换、安全卸载、安装前备份和恢复。
-- **Windows Codex Desktop**：面向普通 Desktop 用户。
-- **No Codex CLI required**：只需要 Windows PowerShell，不要求安装 Codex CLI。
+- **Auto or on-demand** — let it activate around unclear direction, or invoke `$requirements-alignment` yourself.
+- **Native structured questions when available** — uses Codex `request_user_input` when the current Desktop build supports it.
+- **No full planning workflow required** — align only the few decisions that materially change the result.
+- **Re-align on new high-impact decisions** — the guardrail can return after kickoff without continuously interrupting work.
+- **Safe install / uninstall / restore** — switch modes, uninstall, or restore installer-created backups.
+- **Windows Codex Desktop** — no Codex CLI or third-party dependency required.
+
+## Real Codex Desktop test
+
+![Real Codex Desktop Auto Mode test: product form alignment](assets/demo-product-form.png)
+
+*Real Codex Desktop Auto Mode test. The prompt did not explicitly invoke `$requirements-alignment`; the Skill activated before Codex chose Web, Windows, or mobile on the user's behalf.*
 
 ## Why?
 
 ### Before
 
-用户：
+User:
 
-> 帮我做一个个人任务管理工具。
+> Build me a personal task manager.
 
-Codex 可能直接默认：
-
-- Web；
-- `localStorage`；
-- 无账号；
-- 无同步；
-- 某种 UI；
-
-然后开始开发。代码可能已经写了很多，产品方向却未必是用户真正想要的。
+Codex may silently assume Web, `localStorage`, no account, no sync, and an arbitrary UI, then start implementing.
 
 ### After
 
-用户：
-
-> 帮我做一个个人任务管理工具。
-
-Requirements Alignment 先问：
+Requirements Alignment first asks a direction-defining question:
 
 ```text
-第一版你主要希望在哪里使用？
+Where should the first version primarily be used?
 
-○ 浏览器本地应用（推荐）
-○ Windows 桌面应用
-○ 手机优先网页
-○ 其他
+○ Local browser app (Recommended)
+○ Windows desktop app
+○ Mobile-first web app
+○ Other
 ```
 
-方向确定以后，Codex 再自主完成工程实现。
+Once the direction is clear, Codex resumes and owns the engineering work.
 
-Requirements Alignment 关注的是：**“我们到底要做什么？”**，而不是：**“`map` 还是 `for`？”**
+Requirements Alignment focuses on **“What are we actually building?”**, not **“Should this loop use `map` or `for`?”**
 
 ## What it adds
 
 ### 1. Align before coding
 
-一个模糊想法也可以开始。Codex 会先帮助你确认最重要的产品方向，再进入实质性实现。
+A vague idea is enough to start. Codex identifies the few product decisions that need a human answer before substantive implementation.
 
-### 2. Direction guardrail
+### 2. A lightweight direction guardrail
 
-减少 Codex 自行补全目标用户、产品形态、范围、交互或数据边界后一路开发的情况，降低做到一半才发现方向错误或产品行为不符合预期的概率。
+It helps reduce wasted implementation caused by silent assumptions about target users, product form, scope, interaction, data, identity, sync, compatibility, or architecture.
 
-### 3. Ask about direction, not implementation trivia
+### 3. Direction, not implementation trivia
 
-关键方向让用户决定；文件名、helper 位置、变量命名、普通代码组织和其他低影响工程细节继续由 Codex 自主完成。
+The user owns high-impact direction. Codex remains autonomous over filenames, helper placement, variables, routine code structure, ordinary library use, and other low-impact implementation details.
 
-### 4. Auto or Manual
+### 4. Auto or on-demand
 
-Auto 自动介入关键方向对齐；Manual 只在显式调用时运行。觉得 Auto 太主动？随时切 Manual。
+Use Auto for implicit activation around unclear direction. Use on-demand invocation when you want to call the guardrail yourself. Think Auto is too proactive? Switch to Manual at any time.
 
 ## Auto / Manual
 
-### Auto Mode（推荐）
+### Auto Mode (recommended)
 
-正常使用 Codex，不需要输入 `$requirements-alignment`。
+Use Codex normally. You do not need to type `$requirements-alignment`.
 
-当 Codex 发现以下情况时，Requirements Alignment 可以自动介入：
+Requirements Alignment can activate when Codex finds:
 
-- 新项目或空白目录；
-- 只有一个大概的产品想法；
-- 关键产品方向尚未确定；
-- 产品范围、交互、数据边界等存在会明显改变结果的重要选择。
+- a new or blank project;
+- a vague product idea;
+- unresolved product direction;
+- a high-impact choice about scope, interaction, data, identity, sync, compatibility, or architecture.
 
-方向明确后，Codex 会停止提问并继续开发。已有项目中的明确 bug 修复、格式化、版本文字修改等任务不会因此变成需求访谈。
+Once the first implementation direction is coherent, it stops asking and lets Codex continue. Clear bug fixes, formatting, version text edits, and repository-established decisions should proceed without an interview.
 
 ### Manual Mode
 
-Manual Mode 关闭隐式调用，Codex 保持普通工作方式。需要对齐时显式输入：
+Manual Mode disables implicit invocation. Codex works normally until you explicitly invoke:
 
 ```text
 $requirements-alignment
 ```
 
-Auto / Manual 使用同一套需求对齐逻辑，区别只是由 Codex 自动介入，还是由你决定何时启动。
+Auto and Manual use the same alignment policy. The difference is who decides when to start it: Codex or you.
 
 ## See it in action
 
-下面均为 **Requirements Alignment v0.1.0 在 Codex Desktop Auto Mode 下的真实测试结果**。Prompt 中没有显式调用 `$requirements-alignment`，Skill 为自动触发。
+All five images below are real Requirements Alignment v0.1.0 tests in Codex Desktop. The first three demonstrate Auto Mode without an explicit `$requirements-alignment` invocation.
 
-### 1. 确定目标用户
+### 1. Align the target user
 
-测试 Prompt：
+Prompt: *“Build me an AI tool that can make money. Pick whatever makes sense and start developing.”*
 
-> 帮我做一个能赚钱的 AI 工具，你觉得什么合适就直接开始开发。
+Instead of choosing a product on the user's behalf, Requirements Alignment asks which paying user the first version should serve.
 
-只有一个模糊想法时，Requirements Alignment 会先帮助确定目标用户，而不是让 Codex 自己选一个方向直接开写。
+![Real Codex Desktop test: target user alignment](assets/demo-target-user.png)
 
-![真实 Codex Desktop 测试：确定目标用户](assets/demo-target-user.png)
+### 2. Align the product form
 
-### 2. 确定产品形态
+Prompt: *“Build me a personal task manager. This is a brand-new blank project; start developing it.”*
 
-测试 Prompt：
+The user chooses browser, Windows, or mobile before Codex commits to the product form.
 
-> 我想做一个个人任务管理工具，可以记录每天要做的事情、完成状态和一些备注。这是一个全新的空白项目，你直接开始帮我开发。
+![Real Codex Desktop test: product form alignment](assets/demo-product-form.png)
 
-Codex 不再默认替用户决定 Web、Desktop 或 Mobile。产品形态先由用户确定，工程实现再交给 Codex。
+### 3. Align the MVP direction
 
-![真实 Codex Desktop 测试：确定产品形态](assets/demo-product-form.png)
+Prompt: *“I have a rough idea for a small tool that organizes AI tools and APIs. I have not decided what form it should take; build it for me.”*
 
-### 3. 确定 MVP 方向
+Requirements Alignment asks what the first version should primarily accomplish before architecture and implementation follow.
 
-测试 Prompt：
+![Real Codex Desktop test: MVP direction alignment](assets/demo-mvp-direction.png)
 
-> 我有个想法，想做一个帮助我整理 AI 工具和 API 的小工具。现在只是一个大概想法，我还没决定具体做成什么样，你帮我把它做出来。
+*Privacy note: one local absolute path in this real screenshot was masked. The prompt, behavior, native question, and options were not changed.*
 
-先确定第一版到底解决什么问题，再决定后面的架构和实现。
+### 4. Re-align when direction changes
 
-![真实 Codex Desktop 测试：确定 MVP 方向](assets/demo-mvp-direction.png)
+#### Manual alignment when you want it
 
-> 隐私说明：这张真实测试截图中的一条本地绝对路径已做遮挡；Prompt、Requirements Alignment 行为、原生问题和选项均未修改。
+Need alignment only occasionally?
 
-## A guardrail for AI coding
+Invoke `$requirements-alignment` manually when a task reaches a decision you want to keep under human control. Codex can pause before making the affected product decision, ask for your direction, and continue once the decision is clear.
 
-Requirements Alignment 不只用于第一次开工。如果开发过程中出现新的、会显著改变以下内容的决策，它可以再次与用户对齐：
+This demonstrates explicit, on-demand invocation. It does **not** claim that the Manual profile was necessarily installed when the screenshot was taken.
 
-- 产品方向；
-- MVP 范围；
-- 用户可观察行为；
-- 数据边界；
-- 身份系统；
-- 同步方式；
-- compatibility；
-- architecture；
-- destructive changes。
+![Real Codex Desktop test: manual on-demand alignment](assets/demo-manual-alignment.png)
 
-变量命名、helper 位置、普通代码组织、常规库用法和局部实现细节继续由 Codex 自主完成。这是一道减少方向偏差的护栏，不是“保证项目永远不会跑偏”的承诺。
+*Privacy note: the local Skill path was masked. The prompt, output meaning, native question, and options were not changed.*
 
-## Greenfield Alignment Gate
+#### Re-align during an active Goal
 
-在第一次实质性实现前，Skill 检查三个上层方向是否已经清楚：
+Alignment does not stop after kickoff.
 
-1. **Product goal**：第一版主要解决什么问题或带来什么结果；
-2. **MVP scope**：第一版必须包含什么、可以暂缓什么；
-3. **Primary interaction**：用户第一版主要如何使用它。
+If a new direction-defining decision appears while a Goal is already running, Requirements Alignment can pause before Codex silently commits to that direction. The user makes the high-impact decision, then Codex can continue. Routine engineering details remain autonomous.
 
-这不是固定的三问表单。Skill 只询问仍会改变产品方向的 1–3 个最高价值问题；如果第一个答案会改变后续选项，就先只问第一个。形成足够清晰的第一版方向后立即停止提问并开始实现。
+![Real Codex Desktop test: re-alignment during an active Goal](assets/demo-goal-realignment.png)
 
-决策优先级为：
+*Privacy note: two local absolute paths were masked. The active Goal state, prompt, behavior, native question, and options were not changed.*
 
-1. Product goal / user goal
-2. Scope and boundaries
-3. User-facing behavior / UX
-4. Data / identity / sync / compatibility
-5. Architecture
-6. Implementation details
+The intended lifecycle is lightweight:
 
-越靠上的决策越需要用户确认，越靠下的普通工程决策越由 Codex 自主完成。产品方向未确定时，不会先问“SQLite 还是 JSON”。
+```text
+Vague idea → Align direction → Implement → New high-impact decision → Re-align → Continue
+```
+
+## Codex already has `request_user_input`. What does this add?
+
+Codex and `request_user_input` provide the structured-question capability and native UI.
+
+Requirements Alignment provides the decision policy around that capability:
+
+- when a greenfield idea needs alignment before implementation;
+- which decisions belong to the user;
+- which engineering decisions Codex should make autonomously;
+- when a new direction-defining decision warrants re-alignment during implementation;
+- when alignment is no longer necessary;
+- when Codex should stop asking and resume coding.
+
+**Codex provides the question UI. Requirements Alignment decides when the question is worth asking.**
+
+This project does not claim to have created `request_user_input`, to have invented a new Codex UI, or to make Codex capable of asking questions for the first time. Its contribution is a lightweight direction-alignment policy built on top of the capabilities Codex already provides.
+
+## Direction guardrail
+
+v0.1.0 uses a lightweight **Direction Alignment** policy.
+
+### Greenfield Alignment Gate
+
+Before implementation begins, the gate checks the highest-priority unresolved decisions—starting with **Product goal / user goal**, then scope and user-facing behavior. It asks only what can change the product direction, not a fixed questionnaire.
+
+Requirements Alignment covers two moments.
+
+### 1. Before implementation
+
+When product direction is unresolved, it avoids treating reversible engineering defaults—Web, local storage, no account, no sync, or an arbitrary MVP—as permission to decide the product for the user.
+
+### 2. During implementation
+
+When a new product, scope, behavior, data, identity, sync, compatibility, architecture, or destructive decision appears, it can re-align before that choice is silently embedded in the implementation.
+
+This is **re-align when new high-impact decisions appear**, not continuous monitoring. It stays out of the way until direction needs a human decision.
+
+## Not another planning framework
+
+Requirements Alignment intentionally does less. It is not a full requirements-management system, PRD tool, spec-driven development process, architecture workflow, planning framework, or deep multi-round interview system.
+
+It solves one narrow problem:
+
+> Ask the few high-value questions that determine what is being built. Then get out of the way.
+
+## How is this different?
+
+These projects solve overlapping but different problems:
+
+- [Superpowers Brainstorming](https://github.com/obra/superpowers/blob/main/skills/brainstorming/SKILL.md) turns ideas into approved designs/specs through structured dialogue, approach comparison, design validation, and a planning handoff. Requirements Alignment does not require a complete design or formal spec before continuing.
+- [Oh My Codex Deep Interview](https://github.com/Yeachan-Heo/oh-my-codex/blob/main/skills/deep-interview/SKILL.md) is an intent-first Socratic requirements interview with configurable depth, ambiguity scoring, pressure-testing, and execution-ready artifacts. Requirements Alignment aims only for enough clarity to start the right first version.
+- [GitHub Spec Kit](https://github.com/github/spec-kit) provides a Spec-Driven Development workflow with artifacts across Spec → Plan → Tasks → Implement. Requirements Alignment adds a decision layer to an existing Codex workflow rather than replacing it.
+- [BMAD Method](https://github.com/bmad-code-org/BMAD-METHOD) is a broader AI-driven development methodology spanning analysis, planning, architecture, implementation, and specialized agents. Requirements Alignment has a deliberately smaller scope.
+
+Requirements Alignment can complement these workflows; it does not require users to abandon them.
+
+## Comparison
+
+| Project | Primary goal | Interaction depth | Full spec / plan workflow | Lightweight alignment | Codex Desktop / no CLI focus |
+|---|---|---|---|---|---|
+| **Requirements Alignment** | Direction alignment | Lightweight; a few high-value questions | No | Yes; Auto or on-demand | Yes |
+| Superpowers Brainstorming | Approved design/spec before implementation | Structured dialogue, alternatives, design approval | Design/spec plus planning handoff | Not the primary focus | Not the primary focus |
+| Oh My Codex Deep Interview | Socratic clarification into an execution-ready spec | Configurable quick / standard / deep; potentially multi-round | Requirements artifact plus execution/planning handoff | Quick mode exists; deeper interviewing is the primary focus | No; primarily a Codex CLI workflow layer |
+| GitHub Spec Kit | Spec-Driven Development | Multi-stage artifact workflow | Spec → Plan → Tasks → Implement | Not the primary focus | Agent-agnostic, not Desktop-specific |
+| BMAD Method | Full AI-driven development methodology | Scale-adaptive, multi-agent workflow | Complete lifecycle | Not the primary focus | Multi-tool, not Desktop-specific |
+
+The table summarizes each project's official positioning; it is not a quality ranking.
+
+## Which one should I use?
+
+Use Requirements Alignment if:
+
+- you already like your Codex workflow;
+- you do not want another full planning framework;
+- you mainly want Codex to stop guessing important product decisions;
+- you want alignment to end as soon as the first-version direction is clear;
+- you want optional Auto or explicit on-demand invocation;
+- you primarily use Codex Desktop on Windows.
+
+Consider a full planning/spec framework if:
+
+- you need formal requirements documents;
+- you want detailed architecture or design artifacts;
+- you want a structured multi-stage development lifecycle;
+- you want extensive requirements interviewing;
+- you need durable planning artifacts across the project.
+
+Requirements Alignment is complementary. Choose the amount of process your work actually needs.
 
 ## Quick Start
 
-下载仓库或 Release 中的 `requirements-alignment-v0.1.0.zip`，解压后在 Windows PowerShell 中运行：
+Download the repository or `requirements-alignment-v0.1.0.zip` from the [v0.1.0 Release](https://github.com/jiezeng2004-design/requirements-alignment/releases/tag/v0.1.0), extract it, and run in Windows PowerShell:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\scripts\install.ps1"
 ```
 
-不需要 Codex CLI，也不需要安装第三方依赖。第一次安装时选择：
+No Codex CLI or third-party dependency is required. On first install, choose:
 
 ```text
-1. Auto（推荐）
+1. Auto (recommended)
 2. Manual
 ```
 
-安装位置：
+The Skill is installed at:
 
 ```text
 $HOME\.agents\skills\requirements-alignment
 ```
 
-完成后重启 Codex Desktop，并新建一个任务，让 Skills 和全局规则重新加载。
+Restart Codex Desktop and start a new task so Skills and global instructions are reloaded.
 
 ## Native `request_user_input`
 
-原生结构化 UI 取决于当前 Codex Desktop 版本，可能仍属于 experimental / under-development capability。本项目不把它描述或承诺为稳定能力。
+Native structured input depends on the current Codex Desktop build and may still be experimental or under development. This project does not present it as a guaranteed stable capability.
 
-如果目标 feature 尚未启用，安装器会先说明实验状态，再询问是否尝试增量加入：
+If the target feature is not enabled, the installer explains its experimental status before offering an incremental update:
 
 ```toml
 [features]
 default_mode_request_user_input = true
 ```
 
-安装器只维护这个目标键，并保留其他 feature。`request_user_input` feature 与 Auto / Manual Skill mode 相互独立；切换 Skill mode 不会自动改变该 feature。原生 UI 不可用时，Skill 仍可降级为兼容的普通文本提问。
+The installer manages only that target key and preserves other features. The native feature and the Auto / Manual Skill mode are independent. When native structured input is unavailable, the Skill can fall back to compact plain-text questions.
 
 ## Switch, uninstall, restore
 
-重新运行同一个安装器即可：
+Run the installer again to switch Auto / Manual, reinstall, uninstall, or restore an installer-created backup.
 
-- Auto → Manual；
-- Manual → Auto；
-- 重装或更新；
-- 从安装器备份恢复；
-- 安全卸载。
+Safety boundaries:
 
-安装器的边界：
-
-- 修改前备份已安装 Skill、`AGENTS.md` 和 `config.toml`；
-- 备份保存在 `$HOME\.codex\requirements-alignment-backups\`；
-- 只管理以下明确标记的 AGENTS block：
-
-  ```html
-  <!-- requirements-alignment:start -->
-  ...
-  <!-- requirements-alignment:end -->
-  ```
-
-- 不主动覆盖该 block 之外的用户 AGENTS 规则；
-- 不修改其他 Skills；
-- 卸载默认保留 `default_mode_request_user_input` feature；
-- Restore 前会创建 `pre-restore` 安全备份，并校验安装器 manifest 和 SHA-256；
-- 不修改 Codex 本体，不联网，也不安装软件包。
-
-你可以随时切换 Manual、卸载或从备份恢复，不需要修改 Codex 本体，也不会主动覆盖其他 Skills 和 AGENTS 规则。
+- backs up the installed Skill, `AGENTS.md`, and `config.toml` before changes;
+- stores backups under `$HOME\.codex\requirements-alignment-backups\`;
+- manages only its explicitly marked AGENTS block;
+- does not intentionally overwrite other AGENTS rules or other Skills;
+- keeps the native feature on uninstall by default;
+- creates a pre-restore backup and verifies installer manifests and SHA-256 hashes;
+- does not modify Codex itself, access the network, or install packages.
 
 ## Tests
 
-运行无第三方依赖的隔离测试：
+Run the dependency-free isolated test suite:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\tests\run-tests.ps1"
 ```
 
-测试使用临时用户目录，不修改真实 Codex 配置。它覆盖 fresh Auto、fresh Manual、模式切换、重装、卸载、恢复、已有 AGENTS 内容保留、其他 features 保留、managed block / `[features]` 去重，以及 Greenfield Direction Alignment 的 metadata、规则和行为案例。
-
-原生 Desktop UI 和模型行为必须通过真实 Desktop 测试验证；本 README 的三张截图来自 v0.1.0 Auto Mode 真实测试，不是模拟 UI。
+Tests use temporary user directories and do not modify the real Codex configuration. Native Desktop UI and model behavior require real Desktop verification; all five screenshots in this README are real tests, not generated UI.
 
 ## Version
 
-当前版本：`v0.1.0`
+Current version: `v0.1.0`
 
-这是第一个公开版本。Auto 触发边界和实验性 `request_user_input` 能力仍需要真实用户反馈，因此本项目尚未标记为 v1.0。
+The README on `main` may continue to improve after release. The immutable `v0.1.0` tag and Release remain the first public release.
 
 ## License
 
