@@ -66,7 +66,24 @@ The prompt did not explicitly invoke `$requirements-alignment`; Auto Mode activa
 
 ## Quick start
 
-Use Codex normally with the Skill installed.
+Current release: **v0.1.0**.
+
+Download the repository or `requirements-alignment-v0.1.0.zip` from the [v0.1.0 Release](https://github.com/jiezeng2004-design/requirements-alignment/releases/tag/v0.1.0), extract it, and run in Windows PowerShell:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\scripts\install.ps1"
+```
+
+The installer can:
+
+- install Auto Mode (recommended) or Manual Mode;
+- switch, reinstall, uninstall, or restore installer-created backups;
+- back up the installed Skill, `AGENTS.md`, and `config.toml` before changes;
+- leave other Codex Skills and AGENTS rules untouched.
+
+No Codex CLI or third-party dependency is required. After install, use Codex normally.
+
+Native structured questions use Codex `request_user_input` when the current Desktop build exposes it. That capability may still be experimental; if it is unavailable, the Skill can fall back to compact plain-text questions. The installer does not present native structured input as a guaranteed stable Codex feature.
 
 ### Auto Mode — recommended
 
